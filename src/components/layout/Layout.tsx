@@ -10,8 +10,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-950 text-gray-100"> {/* Ana arkaplan rengi ve min yükseklik */}
       <Navbar /> {/* Navbar'ı en üste yerleştir */}
-      <main className="flex-grow container mx-auto px-4 py-8"> {/* Ana içerik alanı, container ile ortalanmış */}
-        {children} {/* Sayfanın asıl içeriği buraya gelecek */}
+      <main className="flex-grow container mx-auto px-4 py-8 pt-16"> {/* pt-16 eklendi */}
+        {children}
       </main>
       {/* İsteğe bağlı: Footer buraya eklenebilir */}
       {/* <footer className="bg-gray-900 text-center py-4 mt-auto">
