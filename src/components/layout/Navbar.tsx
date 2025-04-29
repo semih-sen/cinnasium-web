@@ -13,14 +13,14 @@ const Navbar: React.FC = () => {
         {/* Sol Taraf: Logo/Site Adı ve Ana Linkler (Değişiklik yok) */}
         <div className="flex items-center space-x-6">
           <Link href="/" className="text-xl font-bold text-purple-400 hover:text-purple-300 transition-colors">
-            Ezoterik Forum
+            <strong>Cinnasium</strong> Forum
           </Link>
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/" className="hover:text-gray-300 transition-colors">
-              Anasayfa
+              Divân
             </Link>
             <Link href="/categories" className="hover:text-gray-300 transition-colors">
-              Kategoriler
+              Sohbet Meydanı
             </Link>
           </div>
         </div>
@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
             // Kullanıcı giriş yapmışsa
             <>
               <span className="text-sm text-gray-300 hidden sm:inline">
-                Hoşgeldin,{' '}
+                Selamun Aleykum,{' '}
                 <Link href="/profile/me" className="font-medium hover:text-purple-300">
                   {user?.username || 'Kullanıcı'} {/* Kullanıcı adını göster */}
                 </Link>
@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
                 onClick={logout} // Logout fonksiyonunu çağır
                 className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors text-sm font-medium"
               >
-                Çıkış Yap
+                Terk Et
               </button>
             </>
           ) : (
@@ -53,13 +53,13 @@ const Navbar: React.FC = () => {
                 href="/login"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded transition-colors text-sm font-medium"
               >
-                Giriş Yap
+                Destur Al
               </Link>
               <Link
                 href="/register"
                 className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded transition-colors text-sm font-medium"
               >
-                Kayıt Ol
+                Kervana Buyur
               </Link>
             </>
           )}

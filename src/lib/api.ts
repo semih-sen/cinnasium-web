@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Backend API adresini .env dosyasından alacağız
 // Dikkat: Next.js'te tarayıcıda erişilebilir environment değişkenleri NEXT_PUBLIC_ ile başlamalıdır.
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'; // NestJS portu genelde 3000'den farklıdır, backend'ine göre ayarla!
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.0.104:3000'; // NestJS portu genelde 3000'den farklıdır, backend'ine göre ayarla!
 
 const api = axios.create({
   baseURL: API_URL,

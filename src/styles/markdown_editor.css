@@ -1,0 +1,32 @@
+/* styles/simplemde-theme.css */
+.editor-toolbar {
+    background-color: #374151 !important; /* bg-gray-700 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+  }
+  
+  .editor-toolbar a {
+    color: #d1d5db !important; /* text-gray-300 */
+  }
+  
+  .editor-toolbar a:hover {
+    background-color: #4b5563 !important; /* hover:bg-gray-600 */
+    color: white !important;
+  }
+  
+  .CodeMirror, .CodeMirror-scroll {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    color: #e5e7eb !important; /* text-gray-200 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+  }
+  
+  .CodeMirror-cursor {
+    border-color: #e5e7eb !important; /* cursor rengi */
+  }
+  
+  .cm-header {
+    color: #818cf8 !important; /* text-indigo-400 */
+  }
+  
+  .cm-link {
+    color: #818cf8 !important; /* text-indigo-400 */
+  }

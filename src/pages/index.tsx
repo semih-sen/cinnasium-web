@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
             Mistisizm, ezoterizm, metafizik ve teknolojinin kesiştiği noktada derin sohbetlere katılın, keşfedin ve paylaşın.
           </p>
           {!isAuthenticated && (
-            <Link href="/register" /* ... */ >Topluluğa Katıl</Link>
+            <Link href="/register" /* ... */ >Kervana Katıl</Link>
           )}
            {isAuthenticated && (
              <Link href="/categories" /* ... */ >Kategorileri Keşfet</Link>
@@ -37,19 +37,19 @@ const HomePage: React.FC = () => {
       {/* Kategori Listesi Alanı (Artık Dinamik) */}
       <section className="mb-12">
         <h2 className="text-3xl font-semibold text-center text-gray-200 mb-8">
-          Tartışma Alanları
+          Hasbihal Bahçeleri
         </h2>
         <div className="p-4 md:p-8 bg-gray-900 rounded-lg shadow-lg"> {/* Arka planı biraz daha koyu yaptım */}
           {isLoading && ( // Yüklenirken göster
             <div className="text-center text-gray-400 py-8">
                {/* Basit bir yükleniyor animasyonu */}
                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
-               <p className="mt-2">Kategoriler yükleniyor...</p>
+               <p className="mt-2">Mecrâlar yükleniyor...</p>
             </div>
           )}
           {error && ( // Hata durumunda göster
             <div className="text-center text-red-400 bg-red-900 border border-red-700 p-4 rounded">
-              Kategoriler yüklenirken bir hata oluştu: {error.message || 'Sunucu hatası'}
+              Mecrâlar yüklenemedi. Ruhani bir aksaklık yaşandı.: {error.message || 'Sunucu hatası'}
             </div>
           )}
           {!isLoading && !error && categories && ( // Yükleme bitti, hata yok ve veri varsa göster

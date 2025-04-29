@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { useRouter } from 'next/router';
 import api from '@/lib/api'; // Oluşturduğumuz API istemcisi
 import { jwtDecode } from "jwt-decode"; // Dikkat: import şekli değişmiş olabilir, kütüphaneye göre kontrol et
+import { toast } from 'react-toastify';
 
 // Kullanıcı bilgilerinin tipi (JWT payload'ına göre genişletilebilir)
 interface User {
@@ -59,6 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
          }
       } catch (err) {
         console.error("Error decoding token:", err);
+        
         localStorage.removeItem('accessToken'); // Geçersiz token'ı temizle
       }
     } else {
@@ -82,6 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setToken(accessToken);
         setUser({ userId: (decoded as any).sub || decoded.userId, username: decoded.username, role: decoded.role });
         setIsAuthenticated(true);
+        toast.success("Destur verilmiştir.")
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`; // Axios default header
         router.push('/'); // Anasayfaya yönlendir
       } else {
@@ -110,6 +113,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await api.post('/auth/register', userData); // Backend endpoint'ine göre '/auth/register' vs. olabilir
       // Başarılı kayıt sonrası ne yapılacağına karar ver
       console.log('Registration successful!');
+      toast.success("Kervanımıza hoş sâdâ verdiniz.")
       // Örneğin kullanıcıyı login sayfasına yönlendirip mesaj gösterebilirsin
       router.push('/login?registered=true'); // Veya özel bir "kayıt başarılı" sayfasına
     } catch (err: any) {
@@ -132,6 +136,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+    toast.success("Terk eyleyişiniz makbuldür.")
     delete api.defaults.headers.common['Authorization']; // Axios header'ını temizle
     router.push('/login'); // Login sayfasına yönlendir
   };
