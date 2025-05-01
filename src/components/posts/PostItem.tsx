@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Post } from '@/types/post';
+import Image from "next/image"
 import ReactMarkdown from 'react-markdown'; // Markdown'ı render etmek için
 // import { formatDistanceToNow } from 'date-fns'; // Örnek zaman formatlama
 // import { tr } from 'date-fns/locale'; // Örnek zaman formatlama
@@ -31,7 +32,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
              {/* Gerçek avatarUrl varsa <img src={post.author.avatarUrl} /> kullan */}
              {
               post.author?.avatarUrl == "default_avatar.png" ?
-             post.author?.username?.[0]?.toUpperCase() || '?' : (<img src={"http://192.168.0.104:3000/auth/"+post.author?.username+"/profileImage"} />)}
+             post.author?.username?.[0]?.toUpperCase() || '?' : (<Image alt={post.author?.username || ""} src={"https://cinnasium.com/api/auth/"+post.author?.username+"/profileImage"} />)}
           </div>
           <span className="font-semibold text-sm md:text-base text-gray-200 hover:text-purple-300 break-words">
             {post.author?.username || 'Bilinmeyen'}

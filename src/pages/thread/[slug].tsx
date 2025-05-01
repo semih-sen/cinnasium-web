@@ -46,6 +46,7 @@ const ThreadPage: React.FC = () => {
     isLoading: isLoadingPostsInitial,
     size,
     setSize,
+    mutate,
     isValidating
   } = useSWRInfinite<Paginated<Post>>(getKey, fetcher, {
        // İlk gönderiyi (thread starter) tekrar tekrar yüklememek için revalidate ayarları
@@ -62,7 +63,7 @@ const handleReplySuccess = () => {
   console.log('Reply successful! Revalidating posts...');
   // SWR'a post verisini yeniden çekmesini/güncellemesini söyle
   // Bu sayede yeni post listede görünür
-  mutate(()=>true)
+  mutate();
   // İsteğe bağlı: Son sayfaya scroll yapabilirsin
 };
 

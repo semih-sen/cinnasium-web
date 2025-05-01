@@ -47,7 +47,7 @@ const CategoryPage: React.FC = () => {
     setSize, // Yeni sayfa yükleme fonksiyonu
     isValidating // Herhangi bir sayfa yükleniyor veya revalidate ediliyor mu?
   } = useSWRInfinite<Paginated<Thread>>(getKey, fetcher);
-console.log(useSWRInfinite<any>(getKey, fetcher).data)
+//console.log(useSWRInfinite<any>(getKey, fetcher).data)
   // threadPages dizisindeki tüm konuları tek bir diziye düzleştir
   const threads: Thread[] = threadPages ? threadPages.reduce((acc, page) => acc.concat(page.items), [] as Thread[]) : [];
 
