@@ -149,10 +149,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ category, categories, onSuc
     try {
       if (category) {
         // Güncelleme
-        await api.patch(`/categories/${category.id}`, payload);
+        await api.patch(`/category/${category.id}`, payload);
       } else {
         // Yeni Ekleme
-        await api.post('/categories', payload);
+        await api.post('/category/create', payload);
       }
       onSuccess(); // Başarı callback'ini çağır (listeyi yenileme vs. parent'ta yapılır)
     } catch (err: any) {
