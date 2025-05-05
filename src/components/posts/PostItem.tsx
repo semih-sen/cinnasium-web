@@ -1,14 +1,17 @@
 // src/components/posts/PostItem.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Post } from '@/types/post';
 import Image from "next/image"
 import ReactMarkdown from 'react-markdown'; // Markdown'ı render etmek için
+import { FaCommentAlt, FaSpinner, FaThumbsDown, FaThumbsUp } from 'react-icons/fa';
+import CommentSection from '../comments/CommentSection';
 // import { formatDistanceToNow } from 'date-fns'; // Örnek zaman formatlama
 // import { tr } from 'date-fns/locale'; // Örnek zaman formatlama
 
 interface PostItemProps {
   post: Post;
+  onVote: (postId: string, value: 1 | -1) => Promise<void>; 
 }
 
  // Basit zaman formatlama fonksiyonu (ThreadListItem'daki ile aynı)
@@ -21,73 +24,104 @@ const formatRelativeTime = (dateString: string) => {
    }
 };
 
-const PostItem: React.FC<PostItemProps> = ({ post }) => {
-  return (
-    <div className={`flex p-4 rounded-lg shadow ${post.isThreadStarter ? 'bg-gradient-to-b from-gray-800 to-gray-850 border-t-2 border-purple-600' : 'bg-gray-800'} mb-5`}>
-      {/* Sol Taraf: Yazar Bilgileri */}
-      <div className="flex-shrink-0 w-24 md:w-32 mr-4 text-center">
-        <Link href={`/profile/${post.author?.username || '#'}`} className="block mb-2">
-          {/* Avatar Placeholder */}
-          <div className="w-16 h-16 md:w-20 md:h-20 mx-auto bg-gray-700 rounded-full mb-2 flex items-center justify-center text-purple-400 text-3xl font-bold">
-             {/* Gerçek avatarUrl varsa <img src={post.author.avatarUrl} /> kullan */}
-             {
-              post.author?.avatarUrl == "default_avatar.png" ?
-             post.author?.username?.[0]?.toUpperCase() || '?' : (<Image alt={post.author?.username || ""} src={"https://cinnasium.com/api/auth/"+post.author?.username+"/profileImage"} />)}
-          </div>
-          <span className="font-semibold text-sm md:text-base text-gray-200 hover:text-purple-300 break-words">
-            {post.author?.username || 'Bilinmeyen'}
-          </span>
-        </Link>
-         {/* Rol, katılım tarihi vb. bilgiler buraya eklenebilir */}
-         <div className="text-xs text-gray-500 mt-1">
-            {/* Örn: <p>Üye</p> <p>Katılım: Ocak 2024</p> */}
+const PostItem: React.FC<PostItemProps> = ({ post, onVote }) => {
+  const [isVoting, setIsVoting] = useState<'up' | 'down' | false>(false);
+   const [showComments, setShowComments] = useState(false); // Sonraki adım için
+
+  // Oylama işlemini yöneten fonksiyon
+  const handleVoteClick = async (value: 1 | -1) => {
+      setIsVoting(value === 1 ? 'up' : 'down');
+      try {
+          await onVote(post.id, value); // Parent component'teki fonksiyonu çağır
+      } catch (error) {
+          // Hata toast'ı parent'ta gösterilebilir veya burada da gösterilebilir
+          console.error("Vote failed in PostItem", error);
+      } finally {
+          setIsVoting(false);
+      }
+  };
+
+
+return (
+  <div className={`flex flex-col sm:flex-row p-4 rounded-lg shadow ${post.isThreadStarter ? 'bg-gradient-to-b from-gray-800 to-gray-850 border-t-2 border-purple-600' : 'bg-gray-800'} mb-5`}>
+    {/* Sol Taraf: Yazar Bilgileri (Değişiklik Yok) */}
+    <div className="flex-shrink-0 w-full sm:w-24 md:w-32 sm:mr-4 text-center sm:text-left mb-4 sm:mb-0">
+       {/* ... (Yazar kartı aynı) ... */}
+         <Link href={`/profile/${post.author?.username || '#'}`} className="block mb-2">
+           <div className="w-16 h-16 md:w-20 md:h-20 mx-auto sm:mx-0 bg-gray-700 rounded-full mb-2 flex items-center justify-center text-purple-400 text-3xl font-bold">
+             {post.author?.username?.[0]?.toUpperCase() || '?'}
+           </div>
+           <span className="font-semibold text-sm md:text-base text-gray-200 hover:text-purple-300 break-words block">
+             {post.author?.username || 'Bilinmeyen'}
+           </span>
+         </Link>
+    </div>
+
+    {/* Sağ Taraf: Mesaj İçeriği ve Metadatası */}
+    <div className="flex-grow">
+      {/* Mesaj Metadatası (Değişiklik Yok) */}
+       <div className="text-xs text-gray-500 mb-2 pb-2 border-b border-gray-700 flex justify-between items-center">
+         <span>
+           Gönderim: {formatRelativeTime(post.createdAt)}
+           {post.isEdited && <span className="ml-2 text-yellow-500">(Düzenlendi)</span>}
+         </span>
+         <Link href={`#post-${post.id}`} className="hover:text-gray-300">#{post.id.substring(0, 6)}</Link>
+       </div>
+
+      {/* Mesaj İçeriği (Değişiklik Yok) */}
+      <div id={`post-${post.id}`} className="prose prose-sm prose-invert max-w-none text-gray-200 mb-4">
+        <ReactMarkdown>{post.content}</ReactMarkdown>
+      </div>
+
+      {/* Alt Kısım: Oylama, Yorumlar ve Aksiyonlar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 pt-2 border-t border-gray-700/50">
+         {/* Sol: Oylama ve Yorum Butonu */}
+         <div className="flex items-center space-x-4 text-gray-400 mb-3 sm:mb-0">
+           {/* Upvote Butonu */}
+           <button
+              onClick={() => handleVoteClick(1)}
+              disabled={!!isVoting}
+              className={`flex items-center space-x-1 hover:text-green-500 transition-colors text-xs disabled:opacity-50 disabled:cursor-wait`}
+              title="Beğen"
+           >
+              {isVoting === 'up' ? <FaSpinner className="animate-spin" /> : <FaThumbsUp />}
+              <span>{post.upvotes ?? 0}</span>
+           </button>
+            {/* Downvote Butonu */}
+           <button
+              onClick={() => handleVoteClick(-1)}
+              disabled={!!isVoting}
+              className={`flex items-center space-x-1 hover:text-red-500 transition-colors text-xs disabled:opacity-50 disabled:cursor-wait`}
+              title="Beğenme"
+           >
+               {isVoting === 'down' ? <FaSpinner className="animate-spin" /> : <FaThumbsDown />}
+              <span>{post.downvotes ?? 0}</span>
+           </button>
+           {/* Yorum Butonu (Sonraki adım) */}
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center space-x-1 hover:text-blue-400 transition-colors text-xs"
+              title="Yorumlar"
+           >
+              <FaCommentAlt />
+              <span>{post.commentCount ?? 0}</span>
+           </button> 
+         </div>
+
+          {/* Sağ: Aksiyon Butonları (Placeholder) */}
+         <div className="flex space-x-3 text-gray-400 text-xs">
+           <button className="hover:text-indigo-400">Yanıtla</button>
+           {/* <button className="hover:text-yellow-400">Düzenle</button> */}
+           {/* <button className="hover:text-red-400">Sil</button> */}
          </div>
       </div>
 
-      {/* Sağ Taraf: Mesaj İçeriği ve Metadatası */}
-      <div className="flex-grow">
-        {/* Mesaj Metadatası */}
-        <div className="text-xs text-gray-500 mb-2 pb-2 border-b border-gray-700 flex justify-between">
-          <span>
-            Gönderim: {formatRelativeTime(post.createdAt)}
-            {post.isEdited && <span className="ml-2 text-yellow-500">(Düzenlendi)</span>}
-          </span>
-           {/* Mesaj Linki/ID'si vb. */}
-           <Link href={`#post-${post.id}`} className="hover:text-gray-300">#{post.id.substring(0, 6)}</Link>
-        </div>
+       {/* Yorum Alanı (Sonraki adımda buraya gelecek) */}
+       {showComments && <CommentSection postId={post.id} />} 
 
-        {/* Mesaj İçeriği (Markdown Render Edilmiş) */}
-        <div id={`post-${post.id}`} className="prose prose-sm prose-invert max-w-none text-gray-200">
-          {/* prose classes (from @tailwindcss/typography) markdown stilini ayarlar */}
-          {/* prose-invert koyu tema için */}
-          <ReactMarkdown >{post.content}</ReactMarkdown>
-        </div>
-
-         {/* İmza Alanı (varsa) */}
-         {/* {post.author?.signature && (
-           <div className="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-400 italic">
-             <ReactMarkdown>{post.author.signature}</ReactMarkdown>
-           </div>
-         )} */}
-
-
-        {/* Alt Kısım: Oylama ve Aksiyon Butonları (Placeholder) */}
-        <div className="flex justify-between items-center mt-4 pt-2 border-t border-gray-700/50">
-           <div className="flex space-x-3 text-gray-400">
-             {/* Oylama Butonları (Placeholder) */}
-             <button className="hover:text-green-500 text-xs">👍 {post.upvotes}</button>
-             <button className="hover:text-red-500 text-xs">👎 {post.downvotes}</button>
-           </div>
-           <div className="flex space-x-3 text-gray-400">
-              {/* Aksiyon Butonları (Placeholder) */}
-             <button className="hover:text-indigo-400 text-xs">Yanıtla</button>
-             {/* <button className="hover:text-yellow-400 text-xs">Düzenle</button> */}
-             {/* <button className="hover:text-red-400 text-xs">Sil</button> */}
-           </div>
-        </div>
-      </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default PostItem;

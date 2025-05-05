@@ -65,9 +65,9 @@ const ThreadListItem: React.FC<ThreadListItemProps> = ({ thread }) => {
 
       {/* Sağ Taraf: Son Mesaj Bilgisi */}
       <div className="text-right text-xs text-gray-400 flex-shrink-0 w-32 md:w-48 truncate">
-        {thread.lastPostBy ? (
-           <Link href={`/profile/${thread.lastPostBy?.username || '#'}`} className="hover:text-gray-200">
-             {thread.lastPostBy?.username || 'Bilinmiyor'}
+        {thread.__lastPostBy__ ? (
+           <Link href={`/profile/${thread.__lastPostBy__?.username || '#'}`} className="hover:text-gray-200">
+             {thread.__lastPostBy__?.username || 'Bilinmiyor'}
            </Link>
         ) : (
           <span>-</span>

@@ -11,6 +11,8 @@ import PostList from '@/components/posts/PostList';
 import { useAuth } from '@/context/AuthContext';
 import { Paginated } from '@/types/paginated';
 import ReplyForm from '@/components/posts/ReplyForm';
+import { toast } from 'react-toastify';
+import api from '@/lib/api';
 
 const POSTS_PER_PAGE = 10; // Sayfa başına mesaj sayısı
 
@@ -56,6 +58,61 @@ const ThreadPage: React.FC = () => {
   const posts: Post[] = postPages ? postPages.reduce((acc, page) => acc.concat(page.items), [] as Post[]) : [];
   const isLoadingMore = isLoadingPostsInitial || (size > 0 && postPages && typeof postPages[size - 1] === 'undefined' && isValidating);
   const isReachingEnd = postPages ? postPages[postPages.length - 1]?.meta.currentPage >= postPages[postPages.length - 1]?.meta.totalPages : false;
+
+
+ // === YENİ: Oylama Fonksiyonu ===
+ const handleVote = async (postId: string, value: 1 | -1) => {
+  if (!isAuthenticated) {
+     toast.error("Oylama yapmak için giriş yapmalısınız.");
+     // İsteğe bağlı: router.push(`/login?redirect=${router.asPath}`);
+     return;
+  }
+
+  // Optimistic Update için mevcut postu bul ve yeni veriyi hazırla
+  let updatedPost: Post | undefined;
+  const optimisticData = postPages?.map(page => ({
+      ...page,
+      items: page.items.map(p => {
+          if (p.id === postId) {
+              // Not: Kullanıcının önceki oyunu bilmediğimiz için basit artırma/azaltma yapıyoruz.
+              // Backend'den kullanıcı oyu gelirse daha doğru bir optimistic update yapılabilir.
+              updatedPost = {
+                 ...p,
+                 upvotes: p.upvotes + (value === 1 ? 1 : 0),
+                 downvotes: p.downvotes + (value === -1 ? 1 : 0),
+                 // Score'u da güncelleyebiliriz
+                 score: (p.score ?? (p.upvotes - p.downvotes)) + value,
+              };
+              return updatedPost;
+          }
+          return p;
+      })
+  }));
+
+  // Mutate'i optimistic data ile çağır, ama revalidate etme (API call sonrası edeceğiz)
+  if(optimisticData) {
+      await mutate(optimisticData, false); // revalidate: false
+  }
+
+  try {
+     // API isteğini at
+     await api.post(`/posts/${postId}/vote`, { value });
+     // API başarılı olursa, veriyi tekrar validate et (sunucudan doğru sayıyı al)
+     // Eğer optimistic update doğruysa arayüzde değişiklik olmaz.
+      toast.info("Oyunuz kaydedildi.", { autoClose: 1500 }); // Hafif bir bildirim
+     await mutate(); // Revalidate: true (varsayılan)
+
+  } catch (err: any) {
+     console.error("Vote error:", err);
+     toast.error(err.response?.data?.message || 'Oylama sırasında bir hata oluştu.');
+     // Hata durumunda eski veriye geri dönmek için tekrar mutate çağır (optimistic update'i geri al)
+     await mutate();
+     // Hatanın kendisini de fırlatabiliriz (PostItem'daki loading state'i için)
+     throw err;
+  }
+};
+// =============================
+
 
 
 // Cevap başarılı olduğunda çağrılacak fonksiyon
@@ -113,7 +170,7 @@ const handleReplySuccess = () => {
       <div>
          {isLoadingPostsInitial && <p className="text-center text-gray-400 py-5">Mesajlar yükleniyor...</p>}
          {postsError && <p className="text-center text-red-400 py-5">Mesajlar yüklenirken hata oluştu: {postsError.message}</p>}
-         {!isLoadingPostsInitial && !postsError && <PostList posts={posts} />}
+         {!isLoadingPostsInitial && !postsError && <PostList posts={posts} onVote={handleVote}  />}
 
          {/* Daha Fazla Yükle Butonu */}
          {!isLoadingPostsInitial && !postsError && !isReachingEnd && (

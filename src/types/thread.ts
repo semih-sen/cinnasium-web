@@ -15,7 +15,7 @@ export interface Thread {
   // Backend ilişkileri nasıl kurduysa (nested object veya sadece ID)
   category?: Pick<Category, 'id' | 'name' | 'slug'>; // Kategori bilgisi
   author?: Pick<User, 'id' | 'username'>;        // Yazar bilgisi
-  lastPostBy?: Pick<User, 'id' | 'username'>;   // Son mesajı yazan
+  __lastPostBy__?: Pick<User, 'id' | 'username'>;   // Son mesajı yazan
   // Backend'den gelen diğer alanlar
 }
 
