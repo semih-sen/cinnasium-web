@@ -14,3 +14,5 @@ export interface UserProfile {
   lastLoginAt?: string | null; // ISO Date string
   // Backend'den gelen diğer alanlar
 }
+
+

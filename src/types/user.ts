@@ -21,3 +21,15 @@ export interface User {
     lastLoginAt?: string | null; // ISO Date string
     // Backend'den gelen diğer alanlar
   }
+  export interface PublicUserProfile {
+    id: string;
+    username: string;
+    avatarUrl?: string | null;
+    signature?: string | null;
+    location?: string | null;
+    role: UserRole; // Rolü göstermek isteyip istemediğine bağlı
+    createdAt: string; // Katılım tarihi için
+    // Opsiyonel İstatistikler (backend sağlarsa)
+    // postCount?: number;
+    // threadCount?: number;
+  }

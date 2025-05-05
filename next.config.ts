@@ -6,7 +6,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   eslint:{
        ignoreDuringBuilds:true
-  }
+  },
+  images: {
+    remotePatterns: [new URL('https://cinnasium.com/media/**')],
+  },
 };
 
 export default nextConfig;
