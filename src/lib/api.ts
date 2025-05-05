@@ -8,7 +8,7 @@ const API_URL2 = 'http://localhost:3000'; // NestJS portu genelde 3000'den farkl
 
 
 const api = axios.create({
-  baseURL: API_URL2,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
